@@ -14,5 +14,26 @@ app.get('/', (req, res) => {
     res.status(200).send('Welcome to the server !')
 })
 
+const http = require('http').createServer(app)
+
+const io = require('socket.io')(http, {
+    cors: {
+        origin: '*'
+    }
+})
+
+io.on('connection', (socket) => {
+    console.log("user connected");
+
+    socket.on('message', (data) => {
+        console.log(data.message);
+        io.emit('broadcast', data)
+    })
+
+    socket.on('disconnect', () => {
+        console.log("user disconnected");
+    })
+})
+
 // Server
-app.listen(port, () => console.log(`Listening on port ${port}`));
+http.listen(port, () => console.log(`Listening on port ${port}`));
